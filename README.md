@@ -1,9 +1,11 @@
-# uaa-webui
-Webui for uaa
+# UAA WebUI
+[![Go Report Card](https://goreportcard.com/badge/github.com/shreddedbacon/uaa-webui)](https://goreportcard.com/report/github.com/shreddedbacon/uaa-webui)
 
+This is intended to be a quick web interface for UAA to perform basic functionality via the browser.
 
 # Docker
 ## Docker Compose
+Modify .envvars to suit the target UAA then run one of the following
 ```
 docker-compose up -d
 ## OR to rebuild
