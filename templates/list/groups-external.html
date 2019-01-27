@@ -1,0 +1,47 @@
+{{define "content"}}
+    <div class="container">
+      <div>
+        <h1>{{.PageTitle}}</h1>
+      </div>
+      <div>
+        <table id="users" class="table table-bordered table-hover" style="width:100%">
+          <thead class="text-white bg-info">
+            <tr>
+              <td>Display Name</td>
+              <td>External Group</td>
+              <td>GroupID</td>
+              <td>Origin</td>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .PageData}}
+              <tr>
+                <td>{{ .DisplayName }}</td>
+                <td>{{ .ExternalGroup }}</td>
+                <td><span class="badge badge-secondary">{{.GroupID}}</span></td>
+                <td>{{ .Origin }}</td>
+            </tr>
+            {{else}}<tr><td colspan="7">No Providers Were Found</td></tr>{{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-danger">
+                Delete Provider?
+            </div>
+            <div class="modal-body">
+                Are you sure?<br>
+                This can't be undone!<br>
+                Make sure you want to do this!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,12 @@
+github:
+  private_key: ((uaawebui_ssh.private_key))
+  uri: git@github.com:shreddedbacon/uaa-webui.git
+  branch: master
+  user: shreddedbacon
+  repository: uaa-webui
+  access_token: ((github_api_token))
+
+aws:
+  access_key: ((uaabwebui_minio.username))
+  secret_key: ((uaabwebui_minio.password))
+  endpoint: ((uaawebui_minio_endpoint))

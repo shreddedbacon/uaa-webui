@@ -1,0 +1,65 @@
+{{define "content"}}
+    <div class="container">
+      <div>
+        <h1>{{.PageTitle}}</h1>
+      </div>
+      <div>
+        {{ with .ServerInfo }}
+
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-header text-white bg-info ">Info</div>
+            <div class="card-body">
+              <p class="card-text">
+                <ul>
+                  <li>Version: {{ .App.Version }}</li>
+                  <li>ZoneName: {{ .ZoneName}}</li>
+                  <li><a href="https://github.com/cloudfoundry/uaa/commit/{{ .CommitID }}">{{ .CommitID }}</a></li>
+                  <li>EntityID: {{ .EntityID }}</li>
+                  <li>Timestamp: {{ .Timestamp }}</li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header text-white bg-info ">Links</div>
+            <div class="card-body">
+              <p class="card-text">
+                <ul>
+                  <li><a href="{{ .Links.Uaa }}">UAA</a></li>
+                  <li><a href="{{ .Links.Uaa }}{{ .Links.Passwd }}">Password</a></li>
+                  <li><a href="{{ .Links.Login }}">Login</a></li>
+                  <li><a href="{{ .Links.Uaa }}{{ .Links.Register }}">Register</a></li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          <!--div class="card"><!-- leave out until figure out how to do this better >
+            <div class="card-header text-white bg-info ">IDP Definitions</div>
+            <div class="card-body">
+              <p class="card-text">{{ .IDPDefinitions }}</p>
+            </div>
+          </div-->
+        </div>
+        {{else}}Unable To retrieve Server Info{{end}}
+      </div>
+    </div>
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-danger">
+                Delete Credential?
+            </div>
+            <div class="modal-body">
+                Are you sure?<br>
+                This can't be undone!<br>
+                Make sure you want to do this!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

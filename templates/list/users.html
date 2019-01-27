@@ -1,0 +1,64 @@
+{{define "content"}}
+    <div class="container">
+      <div>
+        <h1>{{.PageTitle}}</h1>
+      </div>
+      <div>
+        <table id="users" class="table table-bordered table-hover" style="width:100%">
+          <thead class="text-white bg-info">
+          <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>External ID</th>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Origin</th>
+            <th>Zone ID</th>
+            <th>Email Address(s)</th>
+            <!--th>Delete</th-->
+          </tr>
+        </thead>
+        <tbody>
+          {{range .PageData}}
+            <tr>
+              <td><span class="badge badge-secondary">{{.GUID}}</span></td>
+              <td>
+                {{if .Active}}<span class="badge badge-success">Active</span>{{else}}<span class="badge badge-danger">Inactive</span>{{end}}<br>
+                {{if .Verified}}<span class="badge badge-success">Verified</span>{{else}}<span class="badge badge-danger">Unverified</span>{{end}}
+              </td>
+              <td>{{ .ExternalID }}</td>
+              <td>{{ .Username }}</td>
+              <td>{{if .Name.FamilyName}}{{ .Name.FamilyName }}, {{end}}{{if .Name.GivenName}}{{ .Name.GivenName }}{{end}}</td>
+              <td>{{ .Origin }}</td>
+              <td>{{ .ZoneID }}</td>
+              <td>
+                {{ range .Emails }}
+                {{.Value}}{{if .Primary}}<span class="badge badge-primary">Primary</span>{{end}}
+                {{end}}
+              </td>
+              <!--td><a href="#" class="btn btn-outline-danger" data-toggle="modal" data-target="#confirm-delete" data-href="#{{.Name}}">Delete</a></td-->
+          </tr>
+          {{else}}<tr><td colspan="7">No Users Were Found</td></tr>{{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-danger">
+                Delete User?
+            </div>
+            <div class="modal-body">
+                Are you sure?<br>
+                This can't be undone!<br>
+                Make sure you want to do this!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
