@@ -78,119 +78,9 @@ type CredentialPageData struct {
 	Flash      Flash
 }
 
-func DisplayUAAInfo(w http.ResponseWriter, r *http.Request) {
-	//set the access token from session
-	session := GetSession(w, r, cookieName)
-	accessToken, _ := session.Values["access_token"].(string)
-
-	//api call to make
-	apiQuery := "/info"
-	//if we get a search query, add it to the api_query
-	param1, ok := r.URL.Query()["search"]
-	if ok {
-		apiQuery = apiQuery + param1[0]
-	}
-	// set up netClient for use later
-	var netClient = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //ignore cert for now FIX: add uaa certificate as environment variables on startup
-	req, _ := http.NewRequest("GET", uaaServer+apiQuery, bytes.NewBuffer([]byte("")))
-	req.Header.Add("authorization", "bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
-	resp, reqErr := netClient.Do(req)
-	if reqErr != nil {
-		fmt.Println(reqErr)
-		http.Error(w, "Error", http.StatusBadRequest)
-		return
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	uaaRespBytes := []byte(body)
-	uaaResp := ServerInfo{}
-	if uaaServErr := json.Unmarshal([]byte(uaaRespBytes), &uaaResp); uaaServErr != nil {
-		fmt.Println(uaaServErr)
-	}
-	flashsession := GetSession(w, r, "flash-cookie")
-	flashes := flashsession.Flashes()
-	var flash Flash
-	if len(flashes) > 0 {
-		flash = flashes[0].(Flash)
-	}
-	err := flashsession.Save(r, w)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var p jwt.Parser
-	claims := jwt.MapClaims{}
-	_, _, _ = p.ParseUnverified(accessToken, claims)
-	userNameVal := ""
-	if val, ok := claims["user_name"]; ok {
-		userNameVal = val.(string)
-	} else {
-		userNameVal = claims["client_id"].(string)
-	}
-	data := CredentialPageData{
-		PageTitle:  "UAA Info",
-		ServerInfo: uaaResp,
-		UserName:   userNameVal,
-		Flash:      flash,
-	}
-	tmpl := template.Must(template.ParseFiles("templates/uaainfo.html", "templates/base.html"))
-	tmpl.ExecuteTemplate(w, "base", data)
-}
-
-func ReturnBlank(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "")
-}
-
-func RedirectHome(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func RedirectLogin(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-}
-
-func FaviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "favicon.ico")
-}
-
-func GetSession(w http.ResponseWriter, r *http.Request, sessionCookie string) *sessions.Session {
-	session, err := store.Get(r, sessionCookie)
-	if err != nil {
-		fmt.Printf("session error")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return nil
-	}
-	return session
-}
-
-func AddFlash(w http.ResponseWriter, r *http.Request, flashMessage string, flashType string) {
-	flashsession := GetSession(w, r, "flash-cookie")
-	flash := Flash{
-		Type:    flashType,
-		Message: flashMessage,
-		Display: true,
-	}
-	flashsession.AddFlash(flash)
-	flashsession.Save(r, w)
-}
-
-func CheckError(w http.ResponseWriter, r *http.Request, responseBody []byte, defaultFlashMessage string, defaultFlashType string) {
-	var rawJson map[string]interface{}
-	json.Unmarshal(responseBody, &rawJson)
-	for a, b := range rawJson {
-		if a == "error" {
-			AddFlash(w, r, b.(string), "danger")
-			return
-		}
-	}
-	AddFlash(w, r, defaultFlashMessage, defaultFlashType)
-	return
-}
-
+/*
+	Function that will validate JWT
+*/
 func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		session := GetSession(w, req, cookieName)
@@ -218,15 +108,9 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
+/*
+	Main
+*/
 func main() {
 	keyValVar := flag.String("cookie-key", "", "Must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)")
 	cookieNameVar := flag.String("cookie-name", "auth-cookie", "Name of the cookie to use (auth-cookie)")
@@ -333,6 +217,9 @@ func main() {
 	}
 }
 
+/*
+	Function used to print requests to log
+*/
 func LogRequest(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
@@ -348,6 +235,9 @@ func MapToString(mapVal map[string]interface{}) string {
 	return string(retBytes)
 }
 
+/*
+	Function that takes an api query string, makes the request to UAA and returns a byte array, flash message and the user name(from JWT) for displaying on pages
+*/
 func ClientRequest(w http.ResponseWriter, r *http.Request, apiQuery string) ([]byte, Flash, string) {
 	session := GetSession(w, r, cookieName)
 
@@ -375,7 +265,6 @@ func ClientRequest(w http.ResponseWriter, r *http.Request, apiQuery string) ([]b
 	}
 	if len(flashes) > 0 {
 		flash = flashes[0].(Flash)
-		fmt.Println(flash)
 	}
 
 	var p jwt.Parser
@@ -388,4 +277,97 @@ func ClientRequest(w http.ResponseWriter, r *http.Request, apiQuery string) ([]b
 		userNameVal = claims["client_id"].(string)
 	}
 	return uaaRespBytes, flash, userNameVal
+}
+
+/*
+	Make a client request to UAA and display the info on a page
+*/
+func DisplayUAAInfo(w http.ResponseWriter, r *http.Request) {
+	apiQuery := "/info"
+	uaaRespBytes, flash, userNameVal := ClientRequest(w, r, apiQuery)
+	uaaResp := ServerInfo{}
+	if uaaServErr := json.Unmarshal([]byte(uaaRespBytes), &uaaResp); uaaServErr != nil {
+		fmt.Println(uaaServErr)
+	}
+	data := CredentialPageData{
+		PageTitle:  "UAA Info",
+		ServerInfo: uaaResp,
+		UserName:   userNameVal,
+		Flash:      flash,
+	}
+	tmpl := template.Must(template.ParseFiles("templates/uaainfo.html", "templates/base.html"))
+	tmpl.ExecuteTemplate(w, "base", data)
+}
+
+/*
+	Function that will return a blank page
+*/
+func ReturnBlank(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "")
+}
+
+/*
+	Function that will redirect user to /
+*/
+func RedirectHome(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+/*
+	Function that will redirect user to log in page
+*/
+func RedirectLogin(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+/*
+	Function return the facivon
+*/
+func FaviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "favicon.ico")
+}
+
+/*
+	Function to get a session
+*/
+func GetSession(w http.ResponseWriter, r *http.Request, sessionCookie string) *sessions.Session {
+	session, err := store.Get(r, sessionCookie)
+	if err != nil {
+		fmt.Printf("session error")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
+	return session
+}
+
+/*
+	Function to add a flash message to sessions
+*/
+func AddFlash(w http.ResponseWriter, r *http.Request, flashMessage string, flashType string) {
+	flashsession := GetSession(w, r, "flash-cookie")
+	flash := Flash{
+		Type:    flashType,
+		Message: flashMessage,
+		Display: true,
+	}
+	flashsession.AddFlash(flash)
+	flashsession.Save(r, w)
+}
+
+/*
+	Function that will check error type
+*/
+func CheckError(w http.ResponseWriter, r *http.Request, responseBody []byte, defaultFlashMessage string, defaultFlashType string) {
+	var rawJson map[string]interface{}
+	json.Unmarshal(responseBody, &rawJson)
+	for a, b := range rawJson {
+		// Currently only looks for error types, but could add an else for generic errors if there are any
+		if a == "error" {
+			AddFlash(w, r, b.(string), "danger")
+			return
+		}
+	}
+	AddFlash(w, r, defaultFlashMessage, defaultFlashType)
+	return
 }

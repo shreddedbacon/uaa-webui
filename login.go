@@ -98,7 +98,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	if list.Error != "" {
 		flash := Flash{
-			Type:    "notice",
+			Type:    "warning",
 			Message: list.ErrorDesc,
 			Display: true,
 		}
