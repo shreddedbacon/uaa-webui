@@ -71,6 +71,7 @@ type OauthClient struct {
 	ResourceIDs            []string `json:"resource_ids"`
 	Authorities            []string
 	AuthorizedGrantTypes   []string `json:"authorized_grant_types"`
+	AllowedProviders			 []string `json:"allowedproviders"`
 	LastModified           int
 	RedirectURI            []string `json:"redirect_uri"`
 	SignupRedirectURL      string   `json:"signup_redirect_url"`
@@ -94,6 +95,7 @@ type IdentityProviders struct {
 	Version      int
 	Config       string
 	Created      int
+	IdentityZoneId string `json:"identityZoneId"`
 	LastModified int `json:"last_modified"`
 }
 

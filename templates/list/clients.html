@@ -15,6 +15,7 @@
               <td>Authorities</td>
               <td>Authorized Grant Types</td>
               <td>Redirect URI</td>
+              <td>Allowed Providers</td>
               <td>Last Modified</td>
             </tr>
           </thead>
@@ -29,6 +30,7 @@
                 <td>{{ range .Authorities }}<span class="badge badge-primary">{{.}}</span>{{end}}</td>
                 <td>{{ range .AuthorizedGrantTypes }}<span class="badge badge-success">{{.}}</span>{{end}}</td>
                 <td>{{ range .RedirectURI}}<span class="badge badge-warning">{{.}}</span>{{end}}</td>
+                <td>{{ range .AllowedProviders}}<span class="badge badge-info">{{.}}</span>{{end}}</td>
                 <td id="display{{.ID}}"></td>
                 <script>
                     var data = new Date({{ .LastModified }});

@@ -10,6 +10,7 @@
               <td>Client ID</td>
               <td>Name</td>
               <td>Config</td>
+              <td>Identity Zone ID</td>
               <td>Last Modified</td>
             </tr>
           </thead>
@@ -24,6 +25,7 @@
                     document.getElementById("display{{.ID}}").innerHTML = JSON.stringify(data, undefined, 2);
                 </script>
                 <!--td>{{ .Config }}</td-->
+                <td>{{ .IdentityZoneId }}</td>
                 <td>{{ .LastModified }}</td>
             </tr>
             {{else}}<tr><td colspan="7">No Providers Were Found</td></tr>{{end}}
