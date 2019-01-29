@@ -26,16 +26,16 @@
             <div class="card-body">
               <p class="card-text">
                 <ul>
-                  <li><a href="{{ .Links.Uaa }}">UAA</a></li>
-                  <li><a href="{{ .Links.Uaa }}{{ .Links.Passwd }}">Password</a></li>
-                  <li><a href="{{ .Links.Login }}">Login</a></li>
-                  <li><a href="{{ .Links.Uaa }}{{ .Links.Register }}">Register</a></li>
+                  <li>UAA: {{ .Links.Uaa }}"</li>
+                  <li>Passwd: {{ .Links.Passwd }}</li>
+                  <li>Login: {{ .Links.Login }}</li>
+                  <li>Register: {{ .Links.Register }}</li>
                 </ul>
               </p>
             </div>
           </div>
-          <!--div class="card"><!-- leave out until figure out how to do this better >
-            <div class="card-header text-white bg-info ">IDP Definitions</div>
+          <!--div class="card"--><!-- leave out until figure out how to do this better -->
+            <!--div class="card-header text-white bg-info ">IDP Definitions</div>
             <div class="card-body">
               <p class="card-text">{{ .IDPDefinitions }}</p>
             </div>
