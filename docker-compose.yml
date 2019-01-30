@@ -1,6 +1,6 @@
 version: '2.3'
 services:
-  uaa_ui: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
+  uaa_ui:
     build:
       context: .
       dockerfile: Dockerfile
