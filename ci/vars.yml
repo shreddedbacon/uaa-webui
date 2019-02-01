@@ -6,7 +6,21 @@ github:
   repository: uaa-webui
   access_token: ((github_api_token))
 
-aws:
-  access_key: ((uaabwebui_minio.username))
-  secret_key: ((uaabwebui_minio.password))
-  endpoint: ((uaawebui_minio_endpoint))
+
+uaa_bucket:
+  aws:
+    access_key: ((uaabwebui_minio.username))
+    secret_key: ((uaabwebui_minio.password))
+    endpoint: ((uaawebui_minio_endpoint))
+    bucket_name: uaa
+  regexp: "uaa-webui-linux-(.*).tar.gz"
+
+version:
+  initial: 0.0.3
+  key: version
+  aws:
+    access_key: ((uaabwebui_minio.username))
+    secret_key: ((uaabwebui_minio.password))
+    endpoint: ((uaawebui_minio_endpoint))
+    bucket_name: uaa
+

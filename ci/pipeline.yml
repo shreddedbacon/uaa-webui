@@ -149,6 +149,7 @@ resources:
 
   - name: github-release
     type: github-release
+    every: 15m
     source:
       user:         ((github.user))
       repository:   ((github.repository))
@@ -158,18 +159,18 @@ resources:
     type: semver
     source:
       driver:            s3
-      bucket:            uaa
-      key:               version
-      initial_version:   0.0.3
-      access_key_id:     ((aws.access_key))
-      secret_access_key: ((aws.secret_key))
-      endpoint:          ((aws.endpoint))
+      bucket:            ((version.aws.bucket_name))
+      key:               ((version.key))
+      initial_version:   ((version.initial))
+      access_key_id:     ((version.aws.access_key))
+      secret_access_key: ((version.aws.secret_key))
+      endpoint:          ((version.aws.endpoint))
 
   - name: uaa-webui-bucket
     type: s3
     source:
-      bucket:            uaa
-      access_key_id:     ((aws.access_key))
-      secret_access_key: ((aws.secret_key))
-      regexp:            "uaa-webui-linux-(.*).tar.gz"
-      endpoint:          ((aws.endpoint))
+      bucket:            ((uaabucket.aws.bucket_name))
+      access_key_id:     ((uaabucket.aws.access_key))
+      secret_access_key: ((uaabucket.aws.secret_key))
+      regexp:            ((uaabucket.regexp))
+      endpoint:          ((uaabucket.aws.endpoint))
